@@ -1,27 +1,43 @@
-# 📦 Decentralized File Storage Payments
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
-## 📝 Project Description
+contract StoragePayment {
+    address public owner;
 
-This project implements a basic smart contract to facilitate payments between users and storage providers in a decentralized file storage system. It allows users (clients) to initiate storage deals and release payments once data has been successfully stored.
+    struct StorageDeal {
+        address provider;
+        address client;
+        uint256 amount;
+        bool paid;
+    }
 
-## 🌍 Project Vision
+    uint256 public dealCount;
+    mapping(uint256 => StorageDeal) public deals;
 
-Our vision is to create a secure, trustless, and efficient payment layer for decentralized storage systems. By using blockchain technology and smart contracts, we aim to eliminate the need for centralized intermediaries and ensure fair compensation for storage providers.
+    constructor() {
+        owner = msg.sender;
+    }
 
-## ✨ Key Features
+    function createDeal(address _provider) external payable returns (uint256) {
+        require(msg.value > 0, "Payment required");
 
-- 🔐 **Trustless Deal Creation**: Clients initiate deals by paying upfront.
-- 💸 **Manual Payment Release**: Clients confirm successful storage before releasing funds.
-- 🛠️ **Minimal & Gas-Efficient**: Only essential functions included.
+        dealCount++;
+        deals[dealCount] = StorageDeal({
+            provider: _provider,
+            client: msg.sender,
+            amount: msg.value,
+            paid: false
+        });
 
-## 🚀 Future Scope
+        return dealCount;
+    }
 
-- Add **file hash verification** using IPFS or similar protocols.
-- Implement **auto-payment via storage proof**.
-- Introduce **dispute resolution mechanisms**.
-- Build a **frontend DApp** for easier interaction.
-- Support **ERC-20 tokens** instead of native ETH.
+    function releasePayment(uint256 _dealId) external {
+        StorageDeal storage deal = deals[_dealId];
+        require(msg.sender == deal.client, "Only client can release payment");
+        require(!deal.paid, "Already paid");
 
----
-
-🔗 Powered by Solidity, secured by Ethereum.
+        deal.paid = true;
+        payable(deal.provider).transfer(deal.amount);
+    }
+}
