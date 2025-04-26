@@ -24,7 +24,6 @@ Our vision is to create a secure, trustless, and efficient payment layer for dec
 
 ---
 
-🔗 Powered by Solidity, secured by Ethereum.
 
 ## Contract Details
 0x31a8FCDa3862fb0781b261f2DfCe18dEB0F11B36
