@@ -40,4 +40,16 @@ contract StoragePayment {
         deal.paid = true;
         payable(deal.provider).transfer(deal.amount);
     }
+
+    function getDeal(uint256 _dealId) external view returns (
+        address provider,
+        address client,
+        uint256 amount,
+        bool paid
+    ) {
+        require(_dealId > 0 && _dealId <= dealCount, "Invalid deal ID");
+
+        StorageDeal memory deal = deals[_dealId];
+        return (deal.provider, deal.client, deal.amount, deal.paid);
+    }
 }
